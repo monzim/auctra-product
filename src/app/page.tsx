@@ -33,9 +33,9 @@ export default function Home() {
     <div className="space-y-24 pb-16">
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-background z-0"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center space-y-8 max-w-3xl mx-auto">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-background z-0 rounded-md"></div>
+        <div className="container mx-auto px-4 relative z-10 rounded-md">
+          <div className="text-center space-y-8 max-w-3xl mx-auto rounded-md">
             <h1 className="text-6xl font-extrabold tracking-tight lg:text-7xl">
               Revolutionize{" "}
               <span className="text-primary">Government Procurement</span>

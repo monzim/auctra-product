@@ -100,7 +100,9 @@ export default function RootLayout({
       <body className={ubuntu.className}>
         <div className="min-h-screen bg-background text-foreground">
           <Navbar />
-          <main className="container mx-auto px-4 py-8">{children}</main>
+          <main className="container mx-auto px-4 py-24 min-h-screen">
+            {children}
+          </main>
           <Footer />
         </div>
       </body>
