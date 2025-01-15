@@ -5,6 +5,11 @@ import Link from "next/link";
 export default function Page() {
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-center mb-8">
+        <span className="block text-3xl font-extrabold">
+          Auctra Prototype | Revolutionizing Public Procurement with Blockchain
+        </span>
+      </h1>
       <div className="max-w-4xl mx-auto">
         <iframe
           src="https://www.youtube.com/embed/htVa43BajJY"
@@ -13,7 +18,7 @@ export default function Page() {
           allowFullScreen
         />
       </div>
-      <div className="w-full flex justify-center mt-8">
+      <div className="w-full flex justify-center mt-8 capitalize">
         <Link
           href={"/videos/presentation"}
           className={cn(
@@ -22,7 +27,7 @@ export default function Page() {
             })
           )}
         >
-          Presentation Demo Video
+          See our Presentation video
         </Link>
       </div>
     </div>

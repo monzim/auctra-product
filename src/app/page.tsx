@@ -330,6 +330,41 @@ export default function Home() {
         </div>
       </section>
 
+      {/*  */}
+      <section className="space-y-6">
+        <div className="py-12 px-4 sm:px-6 lg:px-8">
+          <h1 className="text-center mb-8">
+            <span className="block text-3xl font-extrabold">
+              Auctra Pitch Deck
+            </span>
+          </h1>
+          <div className="max-w-4xl mx-auto">
+            <iframe
+              src="https://www.youtube.com/embed/wE3Hw-uF2Zc"
+              className="w-full h-full aspect-video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+
+        <div className="py-12 px-4 sm:px-6 lg:px-8">
+          <h1 className="text-center mb-8">
+            <span className="block text-3xl font-extrabold">
+              Auctra Prototype
+            </span>
+          </h1>
+          <div className="max-w-4xl mx-auto">
+            <iframe
+              src="https://www.youtube.com/embed/htVa43BajJY"
+              className="w-full h-full aspect-video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Call to Action Section */}
       <section className="bg-primary text-primary-foreground py-20">
         <div className="container mx-auto px-4 text-center">
