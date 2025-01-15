@@ -17,11 +17,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AuctraProduct } from "@/lib/type";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-const initialProducts = [
+const initialProducts: AuctraProduct[] = [
   {
     id: 1,
     name: "Office Chairs",
@@ -59,7 +60,9 @@ const initialProducts = [
 export default function Catalog() {
   const [products, setProducts] = useState(initialProducts);
   const [searchHash, setSearchHash] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState<AuctraProduct | null>(
+    null
+  );
 
   const handleSearch = () => {
     const product = products.find((p) => p.hash.includes(searchHash));

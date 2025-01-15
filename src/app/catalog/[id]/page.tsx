@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AuctraProductV2 } from "@/lib/type";
 import { AlertTriangle, Check } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -41,8 +42,8 @@ import { DataSet } from "vis-data/standalone";
 import { Network } from "vis-network/standalone";
 
 // This would typically come from an API or database
-const getProductDetails = (id) => {
-  const products = [
+const getProductDetails = (id: number) => {
+  const products: AuctraProductV2[] = [
     {
       id: 1,
       name: "Office Chairs",
@@ -80,7 +81,7 @@ const getProductDetails = (id) => {
       publishHash: "0xpub012...",
     },
   ];
-  return products.find((p) => p.id === parseInt(id));
+  return products.find((p) => p.id === Number(id));
 };
 
 // Mock price history data with hashes
@@ -95,16 +96,18 @@ const getPriceHistory = () => [
 
 export default function ProductDetail() {
   const params = useParams();
-  const [product, setProduct] = useState(null);
-  const [priceHistory, setPriceHistory] = useState([]);
-  const [selectedPrice, setSelectedPrice] = useState(null);
-  const [showGraph, setShowGraph] = useState(false);
+  const [product, setProduct] = useState<AuctraProductV2 | null>(null);
+  const [priceHistory, setPriceHistory] = useState<
+    { date: string; price: number; hash: string }[]
+  >([]);
+  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
+  const [showGraph, setShowGraph] = useState<boolean>(false);
   const networkRef = useRef(null);
 
   useEffect(() => {
     if (params.id) {
-      const productDetails = getProductDetails(params.id);
-      setProduct(productDetails);
+      const productDetails = getProductDetails(Number(params.id));
+      setProduct(productDetails as any);
       setPriceHistory(getPriceHistory());
     }
   }, [params.id]);
@@ -120,6 +123,7 @@ export default function ProductDetail() {
         })),
       ]);
 
+      //@ts-ignore
       const edges = new DataSet([
         { from: 1, to: 2 },
         ...priceHistory
@@ -148,7 +152,7 @@ export default function ProductDetail() {
         },
       };
 
-      new Network(networkRef.current, data, options);
+      new Network(networkRef.current, { nodes, edges: edges.get() }, options);
     }
   }, [showGraph, priceHistory]);
 
@@ -215,7 +219,7 @@ export default function ProductDetail() {
                     <DialogHeader>
                       <DialogTitle>Publish Hash Details</DialogTitle>
                       <DialogDescription>
-                        Information about the product's publish hash
+                        Information about the product&apos;s publish hash
                       </DialogDescription>
                     </DialogHeader>
                     <div className="py-4">

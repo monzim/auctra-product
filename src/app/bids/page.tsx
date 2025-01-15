@@ -18,11 +18,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AuctraBid } from "@/lib/type";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-const initialBids = [
+const initialBids: AuctraBid[] = [
   {
     id: 1,
     contractor: "Tech Solutions Ltd.",

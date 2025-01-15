@@ -25,13 +25,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AuctraBidV2 } from "@/lib/type";
 import { AlertTriangle, Check } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { DataSet } from "vis-data/standalone";
 import { Network } from "vis-network/standalone";
 
-const initialBids = [
+const initialBids: AuctraBidV2[] = [
   {
     id: 1,
     contractor: "Tech Solutions Ltd.",
@@ -90,7 +91,7 @@ const initialBids = [
 
 export default function ContractorDetails() {
   const params = useParams();
-  const [contractorBids, setContractorBids] = useState([]);
+  const [contractorBids, setContractorBids] = useState([] as AuctraBidV2[]);
   const [showGraph, setShowGraph] = useState(true);
   const networkRef = useRef(null);
 
@@ -119,9 +120,12 @@ export default function ContractorDetails() {
       );
 
       const edges = new DataSet(
-        contractorBids
-          .slice(0, -1)
-          .map((_, index) => ({ from: index, to: index + 1, arrows: "to" }))
+        contractorBids.slice(0, -1).map((_, index) => ({
+          id: index,
+          from: index,
+          to: index + 1,
+          arrows: "to",
+        }))
       );
 
       const data = { nodes, edges };
@@ -272,7 +276,7 @@ export default function ContractorDetails() {
                         <DialogHeader>
                           <DialogTitle>Publish Hash Details</DialogTitle>
                           <DialogDescription>
-                            Information about the bid's publish hash
+                            Information about the bid&apos;s publish hash
                           </DialogDescription>
                         </DialogHeader>
                         <div className="py-4">
