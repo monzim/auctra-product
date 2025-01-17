@@ -36,11 +36,11 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-background z-0 rounded-md"></div>
         <div className="container mx-auto px-4 relative z-10 rounded-md">
           <div className="text-center space-y-8 max-w-3xl mx-auto rounded-md">
-            <h1 className="text-6xl font-extrabold tracking-tight lg:text-7xl">
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight lg:text-7xl">
               Revolutionize{" "}
               <span className="text-primary">Government Procurement</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-md md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Auctra brings unparalleled transparency, efficiency, and trust to
               public tenders through cutting-edge blockchain technology.
             </p>
