@@ -3,13 +3,22 @@ const path = require("path");
 const { ethers } = require("ethers");
 const solc = require("solc");
 
+// Custom JSON.stringify replacer to handle BigInt
+function stringifyWithBigInt(obj, space) {
+  return JSON.stringify(
+    obj,
+    (key, value) => (typeof value === "bigint" ? value.toString() : value),
+    space
+  );
+}
+
 async function main() {
   try {
     // 1. Setup - Paths and Provider
     const contractPath = path.resolve(
       __dirname,
       "../contracts",
-      "CompanyRegistry.sol"
+      "SimpleStorage.sol"
     );
     if (!fs.existsSync(contractPath)) {
       throw new Error(`Contract file not found at ${contractPath}`);
@@ -18,19 +27,29 @@ async function main() {
     const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 
     // Check provider connection
-    const network = await provider.getNetwork();
-    console.log(
-      `Connected to network: ${network.name} (chainId: ${network.chainId})`
-    );
+    try {
+      const network = await provider.getNetwork();
+      console.log(
+        `Connected to network: ${
+          network.name
+        } (chainId: ${network.chainId.toString()})`
+      );
+      const blockNumber = await provider.getBlockNumber();
+      console.log(`Current block number: ${blockNumber}`);
+    } catch (error) {
+      throw new Error(`Failed to connect to provider: ${error.message}`);
+    }
 
-    // 2. Check wallet balance
+    // 2. Check wallet balance and nonce
     const wallet = new ethers.Wallet(
       "0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3",
       provider
     );
     const balance = await provider.getBalance(wallet.address);
+    const nonce = await provider.getTransactionCount(wallet.address, "pending");
     console.log(`Wallet address: ${wallet.address}`);
     console.log(`Wallet balance: ${ethers.formatEther(balance)} ETH`);
+    console.log(`Wallet nonce (pending): ${nonce}`);
 
     if (balance === 0n) {
       throw new Error(
@@ -42,7 +61,7 @@ async function main() {
     const input = {
       language: "Solidity",
       sources: {
-        "CompanyRegistry.sol": {
+        "SimpleStorage.sol": {
           content: source,
         },
       },
@@ -57,10 +76,6 @@ async function main() {
 
     console.log("Compiling contract...");
     const output = JSON.parse(solc.compile(JSON.stringify(input)));
-    console.log(
-      "Compilation output:",
-      JSON.stringify(output.contracts, null, 2)
-    );
 
     if (
       output.errors &&
@@ -72,10 +87,10 @@ async function main() {
     }
 
     const contractOutput =
-      output.contracts["CompanyRegistry.sol"]["CompanyRegistry"];
+      output.contracts["SimpleStorage.sol"]["SimpleStorage"];
     if (!contractOutput) {
       throw new Error(
-        "Contract 'CompanyRegistry' not found in compilation output."
+        "Contract 'SimpleStorage' not found in compilation output."
       );
     }
     if (
@@ -94,31 +109,81 @@ async function main() {
     const abi = contractOutput.abi;
 
     // Debug: Log ABI and Bytecode
-    console.log("Contract ABI:", JSON.stringify(abi, null, 2));
-    console.log("Contract Bytecode:", bytecode);
-    if (!bytecode || bytecode === "0x") {
-      throw new Error("Invalid bytecode: Empty or undefined.");
-    }
-    if (!abi || !Array.isArray(abi)) {
-      throw new Error("Invalid ABI: Empty or not an array.");
-    }
+    console.log("Contract ABI:", stringifyWithBigInt(abi, 2));
+    console.log(
+      "Contract Bytecode (first 100 chars):",
+      bytecode.substring(0, 100) + "..."
+    );
 
     // 4. Deploy the contract
     const factory = new ethers.ContractFactory(abi, bytecode, wallet);
-    console.log("Estimating gas...");
+    console.log("Preparing deployment transaction...");
     const deployTx = factory.getDeployTransaction();
-    const gasEstimate = await provider.estimateGas({
-      ...deployTx,
-      from: wallet.address,
-    });
-    console.log(`Estimated gas: ${gasEstimate}`);
+    console.log("Deployment transaction data:", deployTx.data);
 
-    console.log("Deploying contract...");
-    const contract = await factory.deploy({
+    // Attempt gas estimation
+    let gasEstimate;
+    try {
+      console.log("Estimating gas...");
+      gasEstimate = await provider.estimateGas({
+        ...deployTx,
+        from: wallet.address,
+      });
+      console.log(`Estimated gas: ${gasEstimate.toString()}`);
+    } catch (gasError) {
+      console.error("Gas estimation failed:", gasError.message);
+      console.error(
+        "Full gas estimation error:",
+        stringifyWithBigInt(gasError, 2)
+      );
+      console.warn("Using fallback gas limit of 3,000,000...");
+      gasEstimate = 3000000;
+    }
+
+    // Use simple gas settings to avoid EIP-1559 issues
+    const gasSettings = {
       gasLimit: gasEstimate,
       gasPrice: ethers.parseUnits("20", "gwei"),
-    });
-    const receipt = await contract.deploymentTransaction().wait();
+      nonce: nonce,
+    };
+    console.log(
+      "Deploying contract with settings:",
+      stringifyWithBigInt(gasSettings, 2)
+    );
+
+    // Deploy the contract
+    let contract;
+    try {
+      console.log("Sending deployment transaction...");
+      contract = await factory.deploy(gasSettings);
+      console.log(
+        "Deployment transaction sent, hash:",
+        contract.deploymentTransaction().hash
+      );
+    } catch (deployError) {
+      console.error("Deployment failed:", deployError.message);
+      console.error(
+        "Full deployment error:",
+        stringifyWithBigInt(deployError, 2)
+      );
+      throw deployError;
+    }
+
+    // Wait for transaction confirmation
+    console.log("Waiting for deployment confirmation...");
+    let receipt;
+    try {
+      receipt = await contract.deploymentTransaction().wait();
+      console.log("Deployment receipt:", stringifyWithBigInt(receipt, 2));
+    } catch (waitError) {
+      console.error("Failed to wait for deployment:", waitError.message);
+      console.error("Full wait error:", stringifyWithBigInt(waitError, 2));
+      throw waitError;
+    }
+
+    if (!receipt || !receipt.contractAddress) {
+      throw new Error("Deployment failed: No contract address in receipt.");
+    }
     const contractAddress = await contract.getAddress();
     console.log(`Contract deployed to address: ${contractAddress}`);
 
@@ -136,14 +201,14 @@ async function main() {
     };
     fs.writeFileSync(
       path.join(frontendConfigDir, "contract-config.json"),
-      JSON.stringify(config, null, 2)
+      stringifyWithBigInt(config, 2)
     );
     console.log(
       "Saved contract config to src/lib/blockchain/contract-config.json"
     );
   } catch (error) {
     console.error("Error during deployment:", error.message);
-    console.error(error);
+    console.error("Full error details:", stringifyWithBigInt(error, 2));
     process.exit(1);
   }
 }
@@ -151,6 +216,7 @@ async function main() {
 main()
   .then(() => console.log("Deployment script finished successfully."))
   .catch((error) => {
-    console.error(error);
+    console.error("Unexpected error:", error.message);
+    console.error("Full error details:", stringifyWithBigInt(error, 2));
     process.exit(1);
   });

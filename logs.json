@@ -1,0 +1,42 @@
+
+> auctra-product@0.1.0 deploy-contract
+> node contracts/scripts/deploy.js
+
+Connected to network: unknown (chainId: 1337)
+Current block number: 0
+Wallet address: 0x627306090abaB3A6e1400e9345bC60c78a8BEf57
+Wallet balance: 1000.0 ETH
+Wallet nonce (pending): 0
+Compiling contract...
+Contract compiled successfully.
+Contract ABI: [
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_value",
+        "type": "uint256"
+      }
+    ],
+    "name": "set",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "value",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+Contract Bytecode (first 100 chars): 608060405234801561000f575f80fd5b506101268061001d5f395ff3fe6080604052348015600e575f80fd5b506004361060...
+Preparing deployment transaction...
+Deploy transaction object: {}
