@@ -1,0 +1,14 @@
+{
+  "name": "auctra-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Auctra",
+  "main": "index.js",
+  "private": true,
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ethers": "^6.15.0",
+    "solc": "^0.8.20"
+  }
+}

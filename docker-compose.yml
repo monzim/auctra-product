@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  ipfs:
+    image: ipfs/kubo:latest
+    ports:
+      - "4001:4001" # TCP
+      - "5001:5001" # API
+      - "8080:8080" # Gateway
+    volumes:
+      - ipfs_data:/data/ipfs
+
+  ganache:
+    image: trufflesuite/ganache:latest
+    command: --host 0.0.0.0
+    ports:
+      - "8545:8545"
+
+volumes:
+  ipfs_data:
