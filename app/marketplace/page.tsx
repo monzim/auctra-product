@@ -1,39 +1,54 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useAuth } from "@/components/auth-provider"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { mockProducts } from "@/lib/mock-data"
-import { Search, Plus, QrCode, Eye, LinkIcon, Star } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { useAuth } from "@/components/auth-provider";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { mockProducts } from "@/lib/mock-data";
+import { Search, Plus, QrCode, Eye, LinkIcon, Star } from "lucide-react";
+import Link from "next/link";
 
 export default function MarketplacePage() {
-  const { user } = useAuth()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState<string>("all")
-  const [priceRange, setPriceRange] = useState<string>("all")
+  const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [priceRange, setPriceRange] = useState<string>("all");
 
   const filteredProducts = mockProducts.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = categoryFilter === "all" || product.category === categoryFilter
+      product.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "all" || product.category === categoryFilter;
     const matchesPrice =
       priceRange === "all" ||
       (priceRange === "low" && product.price < 50000) ||
-      (priceRange === "medium" && product.price >= 50000 && product.price < 200000) ||
-      (priceRange === "high" && product.price >= 200000)
+      (priceRange === "medium" &&
+        product.price >= 50000 &&
+        product.price < 200000) ||
+      (priceRange === "high" && product.price >= 200000);
 
-    return matchesSearch && matchesCategory && matchesPrice
-  })
+    return matchesSearch && matchesCategory && matchesPrice;
+  });
 
-  const categories = Array.from(new Set(mockProducts.map((p) => p.category)))
+  const categories = Array.from(new Set(mockProducts.map((p) => p.category)));
 
   return (
     <SidebarProvider>
@@ -63,7 +78,9 @@ export default function MarketplacePage() {
           <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Products</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Products
+                </CardTitle>
                 <Eye className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -73,7 +90,9 @@ export default function MarketplacePage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Categories</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Categories
+                </CardTitle>
                 <Badge className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -83,12 +102,17 @@ export default function MarketplacePage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Vendors</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Active Vendors
+                </CardTitle>
                 <Star className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {Array.from(new Set(mockProducts.map((p) => p.vendorId))).length}
+                  {
+                    Array.from(new Set(mockProducts.map((p) => p.vendorId)))
+                      .length
+                  }
                 </div>
               </CardContent>
             </Card>
@@ -101,7 +125,10 @@ export default function MarketplacePage() {
               <CardContent>
                 <div className="text-2xl font-bold">
                   $
-                  {Math.round(mockProducts.reduce((sum, p) => sum + p.price, 0) / mockProducts.length).toLocaleString()}
+                  {Math.round(
+                    mockProducts.reduce((sum, p) => sum + p.price, 0) /
+                      mockProducts.length
+                  ).toLocaleString()}
                 </div>
               </CardContent>
             </Card>
@@ -151,26 +178,38 @@ export default function MarketplacePage() {
           {/* Products Grid */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredProducts.map((product) => (
-              <Card key={product.id} className="hover:shadow-md transition-shadow">
+              <Card
+                key={product.id}
+                className="hover:shadow-md transition-shadow"
+              >
                 <CardHeader>
                   <div className="aspect-video bg-muted rounded-lg mb-4 flex items-center justify-center">
                     <img
-                      src={product.images[0] || "/placeholder.svg?height=200&width=300&query=product"}
+                      src={
+                        product.images[0] ||
+                        "/placeholder.svg?height=200&width=300&query=product"
+                      }
                       alt={product.name}
                       className="w-full h-full object-cover rounded-lg"
                     />
                   </div>
                   <div className="space-y-2">
-                    <CardTitle className="text-lg leading-tight">{product.name}</CardTitle>
+                    <CardTitle className="text-lg leading-tight">
+                      {product.name}
+                    </CardTitle>
                     <CardDescription>{product.category}</CardDescription>
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-primary">${product.price.toLocaleString()}</span>
+                      <span className="text-2xl font-bold text-primary">
+                        ${product.price.toLocaleString()}
+                      </span>
                       <Badge variant="outline">{product.vendorName}</Badge>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {product.description}
+                  </p>
 
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium">Key Specifications:</h4>
@@ -178,8 +217,13 @@ export default function MarketplacePage() {
                       {Object.entries(product.specifications)
                         .slice(0, 2)
                         .map(([key, value]) => (
-                          <div key={key} className="flex justify-between text-xs">
-                            <span className="text-muted-foreground">{key}:</span>
+                          <div
+                            key={key}
+                            className="flex justify-between text-xs"
+                          >
+                            <span className="text-muted-foreground">
+                              {key}:
+                            </span>
                             <span>{value}</span>
                           </div>
                         ))}
@@ -187,18 +231,24 @@ export default function MarketplacePage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button asChild variant="outline" className="flex-1 bg-transparent">
-                      <Link href={`/marketplace/${product.id}`}>View Details</Link>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="flex-1 bg-transparent"
+                    >
+                      <Link href={`/marketplace/${product.id}`}>
+                        View Details
+                      </Link>
                     </Button>
 
-                    {user?.role === "procuring_officer" && (
+                    {/* {user?.role === "procuring_officer" && (
                       <Button asChild className="flex-1">
                         <Link href={`/marketplace/${product.id}/link-tender`}>
                           <LinkIcon className="mr-2 h-4 w-4" />
                           Link to Tender
                         </Link>
                       </Button>
-                    )}
+                    )} */}
                   </div>
 
                   {/* QR Code Placeholder */}
@@ -215,11 +265,13 @@ export default function MarketplacePage() {
 
           {filteredProducts.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No products found matching your criteria.</p>
+              <p className="text-muted-foreground">
+                No products found matching your criteria.
+              </p>
             </div>
           )}
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

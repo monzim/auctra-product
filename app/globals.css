@@ -4,73 +4,73 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated color tokens to match government-grade design brief */
-  --background: oklch(1 0 0);
+  /* Updated color tokens to match emerald-based government design brief */
+  --background: #ffffff;
   /* Pure white */
-  --foreground: oklch(0.35 0 0);
-  /* Gray-700 equivalent */
-  --card: oklch(0.98 0 0);
-  /* Light gray background */
-  --card-foreground: oklch(0.25 0 0);
-  /* Dark gray text */
-  --popover: oklch(1 0 0);
-  /* White background */
-  --popover-foreground: oklch(0.35 0 0);
-  /* Gray-700 text */
-  --primary: oklch(0.35 0 0);
-  /* Gray-700 primary */
-  --primary-foreground: oklch(1 0 0);
+  --foreground: #475569;
+  /* Slate-600 for main text */
+  --card: #f1f5f9;
+  /* Light gray card background */
+  --card-foreground: #374151;
+  /* Gray-700 card text */
+  --popover: #ffffff;
+  /* White popover background */
+  --popover-foreground: #475569;
+  /* Slate-600 popover text */
+  --primary: #059669;
+  /* Emerald-600 primary */
+  --primary-foreground: #ffffff;
   /* White text on primary */
-  --secondary: oklch(0.55 0.15 264);
-  /* Blue-600 secondary */
-  --secondary-foreground: oklch(1 0 0);
+  --secondary: #10b981;
+  /* Emerald-500 secondary */
+  --secondary-foreground: #ffffff;
   /* White text on secondary */
-  --muted: oklch(0.98 0 0);
+  --muted: #f1f5f9;
   /* Light gray muted */
-  --muted-foreground: oklch(0.25 0 0);
-  /* Dark gray muted text */
-  --accent: oklch(0.55 0.15 264);
-  /* Blue-600 accent */
-  --accent-foreground: oklch(1 0 0);
+  --muted-foreground: #374151;
+  /* Gray-700 muted text */
+  --accent: #10b981;
+  /* Emerald-500 accent */
+  --accent-foreground: #ffffff;
   /* White text on accent */
-  --destructive: oklch(0.55 0.22 25);
+  --destructive: #dc2626;
   /* Red-600 destructive */
-  --destructive-foreground: oklch(1 0 0);
+  --destructive-foreground: #ffffff;
   /* White text on destructive */
-  --border: oklch(0.92 0 0);
-  /* Light border */
-  --input: oklch(1 0 0);
-  /* White input background */
-  --ring: oklch(0.55 0.15 264 / 0.5);
-  /* Blue focus ring */
-  --chart-1: oklch(0.55 0.15 264);
-  /* Blue chart color */
-  --chart-2: oklch(0.45 0 0);
-  /* Gray chart color */
-  --chart-3: oklch(0.55 0.22 25);
-  /* Red chart color */
-  --chart-4: oklch(0.65 0.18 35);
-  /* Orange chart color */
-  --chart-5: oklch(0.6 0.2 30);
-  /* Orange-red chart color */
+  --border: #e5e7eb;
+  /* Gray-200 border */
+  --input: #f1f5f9;
+  /* Light gray input background */
+  --ring: rgba(5, 150, 105, 0.5);
+  /* Emerald focus ring */
+  --chart-1: #10b981;
+  /* Emerald-500 chart color */
+  --chart-2: #059669;
+  /* Emerald-600 chart color */
+  --chart-3: #dc2626;
+  /* Red-600 chart color */
+  --chart-4: #f59e0b;
+  /* Amber-500 chart color */
+  --chart-5: #a16207;
+  /* Amber-700 chart color */
   --radius: 0.5rem;
   /* Consistent border radius */
-  --sidebar: oklch(0.98 0 0);
-  /* Light gray sidebar */
-  --sidebar-foreground: oklch(0.35 0 0);
-  /* Gray-700 sidebar text */
-  --sidebar-primary: oklch(1 0 0);
-  /* White sidebar primary */
-  --sidebar-primary-foreground: oklch(0.35 0 0);
-  /* Gray-700 sidebar primary text */
-  --sidebar-accent: oklch(0.55 0.15 264);
-  /* Blue sidebar accent */
-  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar: #ffffff;
+  /* White sidebar */
+  --sidebar-foreground: #475569;
+  /* Slate-600 sidebar text */
+  --sidebar-primary: #059669;
+  /* Emerald-600 sidebar primary */
+  --sidebar-primary-foreground: #ffffff;
+  /* White sidebar primary text */
+  --sidebar-accent: #10b981;
+  /* Emerald-500 sidebar accent */
+  --sidebar-accent-foreground: #ffffff;
   /* White sidebar accent text */
-  --sidebar-border: oklch(0.92 0 0);
-  /* Light sidebar border */
-  --sidebar-ring: oklch(0.55 0.15 264 / 0.5);
-  /* Blue sidebar focus ring */
+  --sidebar-border: #e5e7eb;
+  /* Gray-200 sidebar border */
+  --sidebar-ring: rgba(5, 150, 105, 0.5);
+  /* Emerald sidebar focus ring */
 }
 
 .dark {
