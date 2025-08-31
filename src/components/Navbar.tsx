@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 const navItems = [
   { href: "/catalog", label: "Catalog" },
   { href: "/bids", label: "Bids" },
+  { href: "/blockchain", label: "Blockchain Demo" },
   { href: "/company", label: "Company" },
 ];
 

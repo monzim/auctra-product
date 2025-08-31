@@ -1,6 +1,6 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Ubuntu_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -82,12 +82,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: BASE_URL,
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-  },
   category: "Technology",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
