@@ -1,13 +1,13 @@
-import type React from "react";
-import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
-import { Analytics } from "@vercel/analytics/next";
 import { AuthProvider } from "@/components/auth-provider";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
+import { Analytics } from "@vercel/analytics/next";
+import type { Metadata } from "next";
+import { Quicksand } from "next/font/google";
+import type React from "react";
 import { Suspense } from "react";
+
 import "./globals.css";
+
+const quicksand = Quicksand({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Auctra - Blockchain Procurement System",
@@ -23,9 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`font-sans ${GeistSans.variable} ${GeistMono.variable} `}
-      >
+      <body className={`font-sans ${quicksand.className}`}>
         <Suspense fallback={<div>Loading...</div>}>
           <AuthProvider>
             <main className="min-h-screen">{children}</main>
