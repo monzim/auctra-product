@@ -1,0 +1,16 @@
+services:
+  ganache:
+    image: trufflesuite/ganache:latest
+    ports:
+      - "8545:8545"
+    command: >
+      --server.host=0.0.0.0
+      --server.port=8545
+      --chain.networkId=1337
+      --wallet.totalAccounts=10
+      --wallet.defaultBalance=1000
+      --miner.blockGasLimit=8000000
+      --wallet.mnemonic="abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+
+volumes:
+  ganache_data:

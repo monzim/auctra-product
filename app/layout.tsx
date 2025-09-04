@@ -1,5 +1,6 @@
 import { AuthProvider } from "@/components/auth-provider";
 import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
 import type React from "react";
@@ -29,6 +30,7 @@ export default function RootLayout({
             <main className="min-h-screen">{children}</main>
           </AuthProvider>
         </Suspense>
+        <Toaster />
         <Analytics />
       </body>
     </html>

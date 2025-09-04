@@ -1,0 +1,124 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = "file:./dev.db"
+}
+
+model User {
+    id                  String     @id @default(cuid())
+    username            String     @unique //
+    email               String     @unique
+    password            String
+    posts               Post[]
+    replies             Reply[]
+    feedbacks           Feedback[] // feedback received for their replies
+    createdAt           DateTime   @default(now())
+    updatedAt           DateTime   @updatedAt
+    userProfileUsername String
+}
+
+model Post {
+    id        String     @id @default(cuid())
+    content   String
+    authorId  String
+    author    User       @relation(fields: [authorId], references: [id])
+    replies   Reply[]
+    feedback  Feedback[]
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+}
+
+model Reply {
+    id        String    @id @default(cuid())
+    content   String
+    postId    String
+    post      Post      @relation(fields: [postId], references: [id])
+    authorId  String
+    author    User      @relation(fields: [authorId], references: [id])
+    feedback  Feedback?
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+}
+
+model Feedback {
+    id         String   @id @default(cuid())
+    content    String
+    replyId    String   @unique
+    postId     String
+    reply      Reply    @relation(fields: [replyId], references: [id])
+    receiverId String // the user who wrote the reply (gets the feedback)
+    receiver   User     @relation(fields: [receiverId], references: [id])
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    Post       Post     @relation(fields: [postId], references: [id])
+}
+
+// Blockchain and Product models
+model Company {
+    id                String                @id @default(cuid())
+    name              String                @unique
+    publicKey         String
+    address           String
+    createdAt         DateTime              @default(now())
+    updatedAt         DateTime              @updatedAt
+    products          Product[]
+    blockchainTransactions BlockchainTransaction[]
+}
+
+model Product {
+    id                String                @id @default(cuid())
+    name              String
+    category          String
+    description       String
+    specifications    String                // JSON string
+    companyId         String
+    company           Company               @relation(fields: [companyId], references: [id])
+    priceHistory      ProductPriceHistory[]
+    createdAt         DateTime              @default(now())
+    updatedAt         DateTime              @updatedAt
+}
+
+model ProductPriceHistory {
+    id                    String    @id @default(cuid())
+    productId             String
+    product               Product   @relation(fields: [productId], references: [id])
+    price                 Float
+    timestamp             DateTime
+    signature             String
+    localTransactionHash  String    @unique
+    publicTransactionHash String?
+    previousTransactionId String?
+    previousTransaction   ProductPriceHistory? @relation("PriceHistoryChain", fields: [previousTransactionId], references: [id])
+    nextTransactions      ProductPriceHistory[] @relation("PriceHistoryChain")
+    createdAt            DateTime  @default(now())
+}
+
+model BlockchainTransaction {
+    id                String   @id @default(cuid())
+    companyId         String
+    company           Company  @relation(fields: [companyId], references: [id])
+    transactionHash   String   @unique
+    blockHash         String
+    blockNumber       Int
+    gasUsed           String   // Store as string due to bigint
+    status            Int
+    transactionType   String   // "product_add", "price_update", etc.
+    data              String   // JSON data
+    publicSyncHash    String?  // Hash on public blockchain
+    createdAt         DateTime @default(now())
+}
+
+// Demo session storage for transaction hashes
+model SessionStorage {
+    id         String   @id @default(cuid())
+    sessionId  String
+    key        String
+    value      String
+    createdAt  DateTime @default(now())
+    expiresAt  DateTime
+}
+
+// aura --> that all feedback --> user_id -->

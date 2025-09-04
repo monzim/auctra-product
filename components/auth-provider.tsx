@@ -55,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("auctra-user");
+    // redirect to landing page
+    window.location.href = "/";
   };
 
   return (

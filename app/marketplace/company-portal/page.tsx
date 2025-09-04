@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -22,7 +22,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { mockProducts, mockCompanySignatures } from "@/lib/mock-data";
+import { CryptoService } from "@/lib/crypto-utils";
+import { toast } from "sonner";
 import {
   Plus,
   Key,
@@ -30,12 +31,27 @@ import {
   Hash,
   CheckCircle,
   AlertTriangle,
+  ExternalLink,
+  Loader2,
 } from "lucide-react";
+
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  vendorName: string;
+}
 
 export default function CompanyPortalPage() {
   const [selectedCompany, setSelectedCompany] = useState("");
   const [privateKey, setPrivateKey] = useState("");
   const [isVerified, setIsVerified] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [companyKeys, setCompanyKeys] = useState<any[]>([]);
+  const [lastTransaction, setLastTransaction] = useState<any>(null);
+
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
@@ -48,52 +64,152 @@ export default function CompanyPortalPage() {
     newPrice: "",
   });
 
-  const handleVerifySignature = () => {
-    // Mock verification process
-    if (privateKey && selectedCompany) {
-      setIsVerified(true);
+  useEffect(() => {
+    // Load company keys
+    const keys = CryptoService.getPreGeneratedCompanyKeys();
+    setCompanyKeys(keys);
+
+    // Load products
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch("/api/products");
+      const data = await response.json();
+      if (data.success) {
+        setProducts(data.products);
+      }
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
     }
   };
 
-  const handleAddProduct = () => {
-    if (!isVerified) return;
-
-    // Mock product addition with digital signature
-    const signature = `SIG_${selectedCompany.toUpperCase()}_${Date.now()}_${Math.random()
-      .toString(36)
-      .substr(2, 6)}`;
-    const blockchainHash = `0x${Math.random().toString(16).substr(2, 40)}`;
-
-    console.log("[auctra] Adding new product with signature:", signature);
-    console.log("[auctra] Blockchain hash:", blockchainHash);
-
-    // Reset form
-    setNewProduct({
-      name: "",
-      category: "",
-      description: "",
-      price: "",
-      specifications: "",
-    });
+  const handleVerifySignature = () => {
+    if (privateKey && selectedCompany) {
+      const companyKey = companyKeys.find(
+        (k) => k.companyName === selectedCompany
+      );
+      if (companyKey && privateKey === companyKey.privateKey) {
+        setIsVerified(true);
+        toast.success("Signature verified successfully!");
+      } else {
+        toast.error("Invalid private key for selected company");
+        setIsVerified(false);
+      }
+    }
   };
 
-  const handleUpdatePrice = () => {
+  const handleAddProduct = async () => {
     if (!isVerified) return;
 
-    // Mock price update with digital signature
-    const signature = `SIG_${selectedCompany.toUpperCase()}_${Date.now()}_${Math.random()
-      .toString(36)
-      .substr(2, 6)}`;
-    const blockchainHash = `0x${Math.random().toString(16).substr(2, 40)}`;
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/blockchain/add-product", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productName: newProduct.name,
+          category: newProduct.category,
+          description: newProduct.description,
+          price: newProduct.price,
+          specifications: newProduct.specifications,
+          companyName: selectedCompany,
+          privateKey,
+        }),
+      });
 
-    console.log("[auctra] Updating price with signature:", signature);
-    console.log("[auctra] New blockchain hash:", blockchainHash);
+      const data = await response.json();
 
-    // Reset form
-    setPriceUpdate({
-      productId: "",
-      newPrice: "",
-    });
+      if (data.success) {
+        setLastTransaction(data.blockchain);
+        toast.success(
+          <div>
+            <div className="font-semibold">Product added to blockchain!</div>
+            <div className="text-sm text-muted-foreground mt-1">
+              Local TX: {data.blockchain.localTransactionHash.slice(0, 10)}...
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Public TX: {data.blockchain.publicTransactionHash.slice(0, 10)}...
+            </div>
+          </div>
+        );
+
+        // Reset form
+        setNewProduct({
+          name: "",
+          category: "",
+          description: "",
+          price: "",
+          specifications: "",
+        });
+
+        // Refresh products
+        fetchProducts();
+      } else {
+        toast.error(data.error || "Failed to add product");
+      }
+    } catch (error) {
+      console.error("Add product error:", error);
+      toast.error("Network error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdatePrice = async () => {
+    if (!isVerified) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/blockchain/update-price", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: priceUpdate.productId,
+          newPrice: priceUpdate.newPrice,
+          companyName: selectedCompany,
+          privateKey,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setLastTransaction(data.blockchain);
+        toast.success(
+          <div>
+            <div className="font-semibold">Price updated on blockchain!</div>
+            <div className="text-sm text-muted-foreground mt-1">
+              Local TX: {data.blockchain.localTransactionHash.slice(0, 10)}...
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Public TX: {data.blockchain.publicTransactionHash.slice(0, 10)}...
+            </div>
+          </div>
+        );
+
+        // Reset form
+        setPriceUpdate({
+          productId: "",
+          newPrice: "",
+        });
+
+        // Refresh products
+        fetchProducts();
+      } else {
+        toast.error(data.error || "Failed to update price");
+      }
+    } catch (error) {
+      console.error("Update price error:", error);
+      toast.error("Network error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -133,7 +249,7 @@ export default function CompanyPortalPage() {
                       <SelectValue placeholder="Select your company" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockCompanySignatures.map((company) => (
+                      {companyKeys.map((company) => (
                         <SelectItem
                           key={company.companyName}
                           value={company.companyName}
@@ -150,10 +266,13 @@ export default function CompanyPortalPage() {
                   <Input
                     id="privateKey"
                     type="password"
-                    placeholder="Enter your private key"
+                    placeholder="Copy private key from below (starts with 0x...)"
                     value={privateKey}
                     onChange={(e) => setPrivateKey(e.target.value)}
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Copy the private key from the "Your Public Key & Address" section below
+                  </p>
                 </div>
               </div>
 
@@ -179,14 +298,51 @@ export default function CompanyPortalPage() {
               {selectedCompany && (
                 <div className="pt-4 border-t">
                   <div className="text-sm font-medium mb-2">
-                    Your Public Key
+                    Your Public Key & Address
                   </div>
-                  <div className="font-mono text-xs bg-muted p-2 rounded break-all">
-                    {
-                      mockCompanySignatures.find(
-                        (c) => c.companyName === selectedCompany
-                      )?.publicKey
-                    }
+                  <div className="space-y-2">
+                    <div className="font-mono text-xs bg-muted p-2 rounded break-all">
+                      <div className="text-muted-foreground">Public Key:</div>
+                      {
+                        companyKeys.find(
+                          (c) => c.companyName === selectedCompany
+                        )?.publicKey
+                      }
+                    </div>
+                    <div className="font-mono text-xs bg-muted p-2 rounded break-all">
+                      <div className="text-muted-foreground">Address:</div>
+                      {
+                        companyKeys.find(
+                          (c) => c.companyName === selectedCompany
+                        )?.address
+                      }
+                    </div>
+                    <div className="font-mono text-xs bg-muted p-2 rounded break-all text-destructive">
+                      <div className="flex justify-between items-center mb-1">
+                        <div className="font-bold">Private Key:</div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const key = companyKeys.find(
+                              (c) => c.companyName === selectedCompany
+                            )?.privateKey;
+                            if (key) {
+                              setPrivateKey(key);
+                              toast.success("Private key copied to input field!");
+                            }
+                          }}
+                          className="h-6 px-2 text-xs"
+                        >
+                          Copy to Input
+                        </Button>
+                      </div>
+                      {
+                        companyKeys.find(
+                          (c) => c.companyName === selectedCompany
+                        )?.privateKey
+                      }
+                    </div>
                   </div>
                 </div>
               )}
@@ -319,12 +475,21 @@ export default function CompanyPortalPage() {
                   <Button
                     onClick={handleAddProduct}
                     disabled={
-                      !isVerified || !newProduct.name || !newProduct.price
+                      !isVerified ||
+                      !newProduct.name ||
+                      !newProduct.price ||
+                      isLoading
                     }
                     className="w-full"
                   >
-                    <Hash className="mr-2 h-4 w-4" />
-                    Add Product with Digital Signature
+                    {isLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Hash className="mr-2 h-4 w-4" />
+                    )}
+                    {isLoading
+                      ? "Adding to Blockchain..."
+                      : "Add Product with Digital Signature"}
                   </Button>
                 </CardContent>
               </Card>
@@ -362,11 +527,14 @@ export default function CompanyPortalPage() {
                           <SelectValue placeholder="Select product to update" />
                         </SelectTrigger>
                         <SelectContent>
-                          {mockProducts.map((product) => (
-                            <SelectItem key={product.id} value={product.id}>
-                              {product.name} - ${product.price.toLocaleString()}
-                            </SelectItem>
-                          ))}
+                          {products
+                            .filter((p) => p.vendorName === selectedCompany)
+                            .map((product) => (
+                              <SelectItem key={product.id} value={product.id}>
+                                {product.name} - $
+                                {product.price.toLocaleString()}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -394,17 +562,77 @@ export default function CompanyPortalPage() {
                     disabled={
                       !isVerified ||
                       !priceUpdate.productId ||
-                      !priceUpdate.newPrice
+                      !priceUpdate.newPrice ||
+                      isLoading
                     }
                     className="w-full"
                   >
-                    <Hash className="mr-2 h-4 w-4" />
-                    Update Price with Digital Signature
+                    {isLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Hash className="mr-2 h-4 w-4" />
+                    )}
+                    {isLoading
+                      ? "Updating on Blockchain..."
+                      : "Update Price with Digital Signature"}
                   </Button>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
+
+          {/* Latest Transaction Status */}
+          {lastTransaction && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Latest Blockchain Transaction
+                </CardTitle>
+                <CardDescription>
+                  Transaction details from the most recent blockchain operation
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Local Blockchain Hash</Label>
+                    <div className="font-mono text-xs bg-muted p-2 rounded break-all flex items-center gap-2">
+                      {lastTransaction.localTransactionHash}
+                      <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Public Blockchain Hash</Label>
+                    <div className="font-mono text-xs bg-muted p-2 rounded break-all flex items-center gap-2">
+                      {lastTransaction.publicTransactionHash}
+                      <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Block Number</Label>
+                    <div className="font-mono text-sm bg-muted p-2 rounded">
+                      #{lastTransaction.blockNumber}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Gas Used</Label>
+                    <div className="font-mono text-sm bg-muted p-2 rounded">
+                      {lastTransaction.gasUsed} gas
+                    </div>
+                  </div>
+                </div>
+                {lastTransaction.linkedToPrevious && (
+                  <div className="space-y-2">
+                    <Label>Linked to Previous Transaction</Label>
+                    <div className="font-mono text-xs bg-blue-50 border border-blue-200 p-2 rounded break-all">
+                      {lastTransaction.linkedToPrevious}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </SidebarInset>
     </SidebarProvider>
