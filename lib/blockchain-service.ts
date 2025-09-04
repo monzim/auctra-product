@@ -28,8 +28,8 @@ export class BlockchainService {
   private useMockMode = false;
 
   constructor() {
-    // Always try to connect to local Ganache blockchain
-    this.provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+    // Always try to connect to local Ganache blockchain 127.0.0.1
+    this.provider = new ethers.JsonRpcProvider("http://18.143.65.80:8545");
     // Use the first account from Ganache for contract operations
     const privateKey =
       "0x1ab42cc412b618bdea3a599e3c9bae199ebf030895b039e9db1e30dafb12b727";
@@ -47,7 +47,9 @@ export class BlockchainService {
     try {
       // Test connection first
       const network = await this.provider.getNetwork();
-      console.log(`[blockchain] Connected to network: ${network.name} (chainId: ${network.chainId})`);
+      console.log(
+        `[blockchain] Connected to network: ${network.name} (chainId: ${network.chainId})`
+      );
 
       // Create transaction data
       const transactionData: TransactionData = {
@@ -97,7 +99,11 @@ export class BlockchainService {
       };
     } catch (error) {
       console.error("[blockchain] Transaction failed:", error);
-      throw new Error(`Blockchain transaction failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Blockchain transaction failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 
@@ -140,7 +146,7 @@ export class BlockchainService {
     if (!this.provider) {
       throw new Error("Blockchain provider not initialized");
     }
-    
+
     try {
       const tx = await this.provider.getTransaction(transactionHash);
       const receipt = await this.provider.getTransactionReceipt(
@@ -161,7 +167,7 @@ export class BlockchainService {
     if (!this.provider) {
       throw new Error("Blockchain provider not initialized");
     }
-    
+
     try {
       const receipt = await this.provider.getTransactionReceipt(
         transactionHash
@@ -189,7 +195,7 @@ export class BlockchainService {
     if (!this.provider) {
       throw new Error("Blockchain provider not initialized");
     }
-    
+
     try {
       const network = await this.provider.getNetwork();
       const blockNumber = await this.provider.getBlockNumber();
