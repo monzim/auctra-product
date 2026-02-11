@@ -37,7 +37,7 @@
     "ethers": "^6.13.4",
     "web3": "^4.15.0",
     "@openzeppelin/contracts": "^5.1.0",
-    "axios": "^1.7.9"
+    "axios": "^1.13.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
